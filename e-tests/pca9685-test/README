@@ -1,0 +1,17 @@
+Basic electrical test of PCA9685 I2C 16-channel 12-bit PWM controller.
+
+Test module is Adafruit https://www.adafruit.com/products/815
+
+Attached to I2C-6 bus of Intel Edison through chippy built-in level shifter.
+
+4x LEDs to to channels 0-3 of controller.
+
+Test application is derived from upm/examples/pca9685.cxx
+
+Driver src is derived from upm/src/pca9685.cxx
+
+Depends on (Intel) libmraa
+
+Compile: g++ -o pca9685-test -lmraa pca9685.cxx pca9685-test.cxx
+
+Depends on user in group 'i2c', or sudo
