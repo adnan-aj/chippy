@@ -7,7 +7,7 @@
 ############################################################################
 
 CC = gcc
-CFLAGS = -c -Wall -I ../c_examples -DSSD1306_128_32
+CFLAGS = -c -Wall -I ../c_examples -DSSD1306_128_64
 LDFLAGS =
 
 TARGET   = lcd
