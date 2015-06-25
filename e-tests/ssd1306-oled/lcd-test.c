@@ -17,7 +17,7 @@
 
 #include "i2c-userspace.h"
 #include "ssd1306.h"
-#include "fonts/font.h"
+#include "fonts/linux/font.h"
 
 extern const struct font_desc *fonts[];
 
