@@ -1,6 +1,6 @@
 /* Ripped and shortened from /usr/src/linux/drivers/video/console/fonts.c */
 
-#include "font.h"
+#include <linux/font.h>
 
 const struct font_desc *fonts[] = {
     &font_vga_8x8,
