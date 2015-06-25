@@ -13,16 +13,16 @@ LDFLAGS =
 TARGET   = lcd
 SOURCES  =  lcd-test.c i2cdev-ssd1306.c
 HEADERS  =  ssd1306.h i2c-userspace.h ../fonts/font.h
-#FONTS    = ../fonts/fonts.a
+FONTS    =  fonts/fonts.a
 
 OBJECTS = $(SOURCES:.c=.o)
 
 $(TARGET): $(OBJECTS) $(FONTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
-#	$(CC) $(LDFLAGS) $(OBJECTS) $(FONTS) -o $@
+#	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECTS) $(FONTS) -o $@
 
-$(FONTS): ../fonts/Makefile ../fonts/font.h ../fonts/fonts.c
-	cd ../fonts/ ; make
+$(FONTS): fonts/Makefile fonts/font.h fonts/fonts.c
+	cd fonts/ ; make
 
 .c.o: $(HEADERS)
 	$(CC) $(CFLAGS) $< -o $@

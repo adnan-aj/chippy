@@ -6,7 +6,8 @@ LDFLAGS =
 
 TARGET = fonts.a
 
-SRCDIR = /usr/src/linux/drivers/video/console/
+#SRCDIR = /usr/src/linux/drivers/video/console/
+SRCDIR = ./
 SOURCES := $(wildcard $(SRCDIR)/font_*.c)
 #SOURCES += fonts.c
 
@@ -17,7 +18,7 @@ $(TARGET): $(OBJECTS) fonts.o
 	
 #%.o: $(SRCDIR)/%.c
 #	gcc $(CC_FLAGS) -c -o $@ $<
-#
+
 %.o: %.c
 	gcc $(CC_FLAGS) -c -o $@ $<
 

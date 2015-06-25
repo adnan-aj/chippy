@@ -5,7 +5,7 @@
 /**********************************************/
 
 #include <linux/font.h>
-#include <linux/module.h>
+//#include <linux/module.h>
 
 #define FONTDATAMAX 4096
 
@@ -4630,4 +4630,4 @@ const struct font_desc font_vga_8x16 = {
 	.data	= fontdata_8x16,
 	.pref	= 0,
 };
-EXPORT_SYMBOL(font_vga_8x16);
+//EXPORT_SYMBOL(font_vga_8x16);

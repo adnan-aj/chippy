@@ -17,7 +17,9 @@
 
 #include "i2c-userspace.h"
 #include "ssd1306.h"
-//#include "../fonts/font.h"
+#include "fonts/font.h"
+
+extern const struct font_desc *fonts[];
 
 #define I2CADDR_OLED 0x3c
 
@@ -92,7 +94,7 @@ int main(int argc, char * argv[])
  
 //    clearDisplay();
     display();
-#if 0
+#if 1
     if (argc > 1)
 	lcd_puts(argv[1]);  
 #endif
@@ -125,7 +127,7 @@ void lcd_gotoxy(int x, int y)
     cur_y = y;
 }  
 
-#if 0    
+#if 1
 int lcd_putchar(int c)
 {
     return lcd_putc(c, 0);
@@ -145,7 +147,7 @@ int lcd_putc(int c, int update)
 {
     int x, y, height, width;
     unsigned char *p;
-    const struct font_desc *font;
+    struct font_desc *font;
   
     font = fonts[fontn];
     width = font->width;

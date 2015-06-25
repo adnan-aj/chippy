@@ -32,6 +32,7 @@ struct font_desc {
 #define ACORN8x8_IDX	8
 #define	MINI4x6_IDX	9
 
+#if 1
 extern const struct font_desc	font_vga_8x8,
 			font_vga_8x16,
 			font_pearl_8x8,
@@ -42,7 +43,7 @@ extern const struct font_desc	font_vga_8x8,
 			font_sun_12x22,
 			font_acorn_8x8,
 			font_mini_4x6;
-
+#endif
 /* Find a font with a specific name */
 
 extern const struct font_desc *find_font(const char *name);
