@@ -138,7 +138,6 @@ int lcd_puts(char *s)
     while (*s) {
 	lcd_putc(*s++, 0);
 	display();
-	msleep(100);
     }
     return 0;
 }
