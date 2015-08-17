@@ -198,52 +198,19 @@ void invertDisplay(uint8_t i) {
 void display(void)
 {
     unsigned char obuf[32];
-    int i, x;
-    
-    ssd1306_command(SSD1306_SETLOWCOLUMN | 0x0);  // low col = 0
+    int i, x, page, blk;
+
+    ssd1306_command(0xb0 | page); // line #0
     ssd1306_command(SSD1306_SETHIGHCOLUMN | 0x0);  // hi col = 0
-    ssd1306_command(SSD1306_SETSTARTLINE | 0x0); // line #0
+    ssd1306_command(SSD1306_SETLOWCOLUMN | 0x0);  // low col = 0
     
-    // I2C
-    for (i = 0; i < (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8); i++) {
-#if 1
-	obuf[0] = 0x40;	
-	for (x = 0; x < 16; x++) 
-	    obuf[x + 1] = buffer[i++];
-	i--;
-	i2c_writeblock(obuf, 16 + 1);
-#else
-	// send a bunch of data in one xmission
-	Wire.beginTransmission(_i2caddr);
-	Wire.write(0x40);
-	for (uint8_t x=0; x<16; x++) {
-	    Wire.write(buffer[i]);
-	    i++;
-	}
-	i--;
-	Wire.endTransmission();
-#endif
-    }
-    // i wonder why we have to do this (check datasheet)
-    if (SSD1306_LCDHEIGHT == 32) {
-	for (i = 0; i < (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8); i++) {
-#if 1
-	    obuf[0] = 0x40;	
-	    for (x = 0; x < 16; x++) 
-		obuf[x + 1] = buffer[i++];
-	    i--;
-	    i2c_writeblock(obuf, 16 + 1);
-#else
-	    // send a bunch of data in one xmission
-	    Wire.beginTransmission(_i2caddr);
-	    Wire.write(0x40);
-	    for (uint8_t x=0; x<16; x++) {
-		Wire.write((uint8_t)0x00);
-		i++;
+    for (page = 0; page < 8; page++) {
+	for (blk = 0; blk < (128/16); blk++) {
+	    obuf[0] = 0x40;
+	    for (i = 0; i < 16; i++) {
+		obuf[i + 1] = buffer[page * 128 + blk * 16 + i];
 	    }
-	    i--;
-	    Wire.endTransmission();
-#endif
+	    i2c_writeblock(obuf, 16 + 1);
 	}
     }
 }

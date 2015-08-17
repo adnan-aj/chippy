@@ -137,8 +137,8 @@ int lcd_puts(char *s)
 {
     while (*s) {
 	lcd_putc(*s++, 0);
-	display();
     }
+    display();
     return 0;
 }
 
