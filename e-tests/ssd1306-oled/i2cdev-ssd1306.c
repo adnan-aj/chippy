@@ -142,7 +142,7 @@ void lcd_init(int fd_i2cdev)
     ssd1306_command(SSD1306_SETDISPLAYCLOCKDIV);            // 0xD5
     ssd1306_command(0x80);                                  // the suggested ratio 0x80
     ssd1306_command(SSD1306_SETMULTIPLEX);                  // 0xA8
-    ssd1306_command(0x1F);
+    ssd1306_command(0x3f);
     ssd1306_command(SSD1306_SETDISPLAYOFFSET);              // 0xD3
     ssd1306_command(0x0);                                   // no offset
     ssd1306_command(SSD1306_SETSTARTLINE | 0x0);            // line #0
@@ -158,7 +158,7 @@ void lcd_init(int fd_i2cdev)
     ssd1306_command(SSD1306_SEGREMAP | 0x1);
     ssd1306_command(SSD1306_COMSCANDEC);
     ssd1306_command(SSD1306_SETCOMPINS);                    // 0xDA
-    ssd1306_command(0x02);
+    ssd1306_command(0x12);
     ssd1306_command(SSD1306_SETCONTRAST);                   // 0x81
     ssd1306_command(0x8F);
     ssd1306_command(SSD1306_SETPRECHARGE);                  // 0xd9
