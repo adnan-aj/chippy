@@ -59,19 +59,47 @@ void lcd_putchar(int c, int update)
     width = font->width;
     height = font->height;
     p = (unsigned char *) font->data;
-    
-    p += (c * height); // font height
+
+    // Modify for fonts with .width bigger thatn 8 pixels
+    // HERE!
+    // 
+    // 
+    if (width <= 8)
+	p += (c * height); // font height
+    else
+	p += (c * height * 2); // font height
     
     // font height
     for (y = 0; y < height; y++) {
 	// font width
 	for (x = 0; x < width; x++) {
-	    drawPixel(cur_x + x, cur_y + y,
+	    if (width <= 8) {
+		drawPixel(cur_x + x, cur_y + y,
 		      ((1 << (8 - 1 - x)) & *(p + y)) ? WHITE : 0);
+	    }
+	    else {
+		if (x < 8)
+		    drawPixel(cur_x + x, cur_y + y,
+			      ((1 << (8 - 1 - x)) & *(p + (y * 2))) ? WHITE : 0);
+#if 1
+		else
+		    drawPixel(cur_x + x, cur_y + y,
+			      ((1 << (16 - x - 1)) & *(p + (y * 2) + 1)) ? WHITE : 0);
+#endif
+	    }
 	}
     }
+    
+    // update pixel cursor
+    cur_x += width;
+    if (cur_x > SSD1306_LCDWIDTH) {
+	cur_x = 0;
+	cur_y += height;
+    }
+    if (cur_y > SSD1306_LCDHEIGHT) {
+	cur_y = 0;
+    }
+
     if (update)
 	display();
-    
-    cur_x += width; // font width
 }
