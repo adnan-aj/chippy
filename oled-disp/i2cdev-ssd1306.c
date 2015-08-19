@@ -12,12 +12,23 @@
 #define _BV( bit ) ( 1<<(bit) ) 
 static unsigned tempbuf[16*32];
 
+static int width(void)
+{
+    return SSD1306_LCDWIDTH;
+}
+
+static int height(void)
+{
+    return SSD1306_LCDHEIGHT;
+}
+
+
 // the most basic function, set a single pixel
 void drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-#if 0
     if ((x < 0) || (x >= width()) || (y < 0) || (y >= height()))
 	return;
+#if 0
     // check rotation, move pixel around if necessary
     switch (getRotation()) {
     case 1:
