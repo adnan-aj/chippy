@@ -1,9 +1,22 @@
+#include <stdlib.h>
+#include <string.h>
 #include "ssd1306.h"
 #include "lcd-gfx.h"
 #include "fonts/linux/font.h"
 
-extern const struct font_desc *fonts[];
+/* http://stackoverflow.com/questions/3982348/implement-generic-swap-macro-in-c */
+#define swap(x,y) do \
+{ unsigned char swap_temp[sizeof(x) == sizeof(y) ? (signed)sizeof(x) : -1]; \
+memcpy(swap_temp,&y,sizeof(x)); \
+memcpy(&y,&x,       sizeof(x)); \
+memcpy(&x,swap_temp,sizeof(x)); \
+} while(0)
 
+#define pixel(X, Y, COLOR, MODE)	drawPixel((X), (Y), (COLOR))
+
+
+
+extern const struct font_desc *fonts[];
 static int cur_x = 0, cur_y = 0, fontn = 0;
 
 void lcd_setfont(int f)
@@ -60,10 +73,6 @@ void lcd_putchar(int c, int update)
     height = font->height;
     p = (unsigned char *) font->data;
 
-    // Modify for fonts with .width bigger thatn 8 pixels
-    // HERE!
-    // 
-    // 
     if (width <= 8)
 	p += (c * height); // font height
     else
@@ -81,11 +90,9 @@ void lcd_putchar(int c, int update)
 		if (x < 8)
 		    drawPixel(cur_x + x, cur_y + y,
 			      ((1 << (8 - 1 - x)) & *(p + (y * 2))) ? WHITE : 0);
-#if 1
 		else
 		    drawPixel(cur_x + x, cur_y + y,
 			      ((1 << (16 - x - 1)) & *(p + (y * 2) + 1)) ? WHITE : 0);
-#endif
 	    }
 	}
     }
@@ -102,4 +109,80 @@ void lcd_putchar(int c, int update)
 
     if (update)
 	display();
+}
+
+
+void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
+	      uint8_t color, uint8_t mode)
+{
+    uint8_t steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) {
+	swap(x0, y0);
+	swap(x1, y1);
+    }
+    
+    if (x0 > x1) {
+	swap(x0, x1);
+	swap(y0, y1);
+    }
+    
+    uint8_t dx, dy;
+    dx = x1 - x0;
+    dy = abs(y1 - y0);
+    
+    int8_t err = dx / 2;
+    int8_t ystep;
+    
+    if (y0 < y1) {
+	ystep = 1;
+    } else {
+	ystep = -1;}
+    
+    for (; x0<x1; x0++) {
+	if (steep) {
+	    pixel(y0, x0, color, mode);
+	} else {
+	    pixel(x0, y0, color, mode);
+	}
+	err -= dy;
+	if (err < 0) {
+	    y0 += ystep;
+	    err += dx;
+	}
+    }
+}
+
+void circle(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color, uint8_t mode) {
+	int8_t f = 1 - radius;
+	int8_t ddF_x = 1;
+	int8_t ddF_y = -2 * radius;
+	int8_t x = 0;
+	int8_t y = radius;
+
+	pixel(x0, y0+radius, color, mode);
+	pixel(x0, y0-radius, color, mode);
+	pixel(x0+radius, y0, color, mode);
+	pixel(x0-radius, y0, color, mode);
+
+	while (x<y) {
+		if (f >= 0) {
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		pixel(x0 + x, y0 + y, color, mode);
+		pixel(x0 - x, y0 + y, color, mode);
+		pixel(x0 + x, y0 - y, color, mode);
+		pixel(x0 - x, y0 - y, color, mode);
+
+		pixel(x0 + y, y0 + x, color, mode);
+		pixel(x0 - y, y0 + x, color, mode);
+		pixel(x0 + y, y0 - x, color, mode);
+		pixel(x0 - y, y0 - x, color, mode);
+
+	}
 }

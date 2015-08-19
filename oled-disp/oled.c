@@ -27,6 +27,12 @@
 #define msleep(MS)	usleep((MS) * 1000)
 
 int  statusbar(void);
+
+extern void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
+		     uint8_t color, uint8_t mode);
+extern void circle(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color, uint8_t mode);
+
+
 int  show_clock(void);
 
 int i2cdev_testopen(const char *devbusname, int i2caddr_test)
@@ -78,10 +84,19 @@ int main(int argc, char * argv[])
     invertDisplay(0);
     msleep(200);
     
-    // display Adafruit's startup buffer
- 
     while(1) {
 	statusbar();
+	
+#if 0
+	lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
+		     uint8_t color, uint8_t mode);
+	circle(uint8_t x0, uint8_t y0, uint8_t radius,
+	       uint8_t color, uint8_t mode) {
+#endif	
+	lcd_line(0, 8, 150, 8, 1, 1);
+        lcd_line(0, 0, 150, 100, 1, 1);
+	circle(50, 50, 10, 1, 1);
+	    
 	show_clock();
 	msleep(200);
     }
