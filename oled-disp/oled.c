@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
+#include <time.h>
 
 #include "ssd1306.h"
 #include "lcd-gfx.h"
@@ -24,6 +25,9 @@
 
 #define I2CADDR_OLED SSD1306_I2C_ADDRESS
 #define msleep(MS)	usleep((MS) * 1000)
+
+int  statusbar(void);
+int  show_clock(void);
 
 int i2cdev_testopen(const char *devbusname, int i2caddr_test)
 {
@@ -64,6 +68,7 @@ int main(int argc, char * argv[])
     
     lcd_init(fd_oled);
     clearDisplay();
+    display();
     invertDisplay(1);
     msleep(200);
     invertDisplay(0);
@@ -74,21 +79,69 @@ int main(int argc, char * argv[])
     msleep(200);
     
     // display Adafruit's startup buffer
-    display();
-    startscrollleft(0, 127);
-    msleep(1000);
-    stopscroll();
-    msleep(200);
  
-//    clearDisplay();
-    display();
-#if 1
-    if (argc > 1)
-	lcd_puts(argv[1]);  
-#endif
-
+    while(1) {
+	statusbar();
+	show_clock();
+	msleep(200);
+    }
+    
+    
     return 0;
     
 }
 
 
+int statusbar(void)
+{
+    static time_t prev_time;
+    time_t current_time;
+    struct tm * time_info;
+    char timeString[32];  // space for "HH:MM:SS\0"
+    
+    time(&current_time);
+    if (current_time == prev_time) {
+	return -1;
+    }
+    
+    prev_time = current_time;
+    time_info = localtime(&current_time);
+    strftime(timeString, sizeof(timeString), "%a %h %e %H:%M", time_info);
+
+    puts(timeString);
+    lcd_setfont(0);
+    lcd_gotoxy(0,0);
+    lcd_puts(timeString);
+    return 0;
+}
+
+int show_clock(void)
+{
+    static time_t prev_time;
+    time_t current_time;
+    struct tm * time_info;
+    char timeString[16];  // space for "HH:MM:SS\0"
+    
+    time(&current_time);
+    if (current_time == prev_time) {
+	return -1;
+    }
+    
+    prev_time = current_time;
+    time_info = localtime(&current_time);
+    strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
+
+    lcd_setfont(1);
+    lcd_gotoxy(32,16);
+    lcd_puts(timeString);
+
+    lcd_setfont(3);
+    lcd_gotoxy(32,32);
+    lcd_puts(timeString);
+    
+    lcd_setfont(5);
+    lcd_gotoxy(32,46);
+    lcd_puts(timeString);
+  
+    return 0;
+}
