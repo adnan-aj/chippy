@@ -108,7 +108,6 @@ int statusbar(void)
     time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%a %h %e %H:%M", time_info);
 
-    puts(timeString);
     lcd_setfont(0);
     lcd_gotoxy(0,0);
     lcd_puts(timeString);
@@ -131,6 +130,7 @@ int show_clock(void)
     time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
 
+#if 0
     lcd_setfont(1);
     lcd_gotoxy(32,16);
     lcd_puts(timeString);
@@ -138,9 +138,9 @@ int show_clock(void)
     lcd_setfont(3);
     lcd_gotoxy(32,32);
     lcd_puts(timeString);
-    
+#endif
     lcd_setfont(5);
-    lcd_gotoxy(32,46);
+    lcd_gotoxy((128 - (12 * 8))/2, (64 - 22) / 2 + 8);
     lcd_puts(timeString);
   
     return 0;
