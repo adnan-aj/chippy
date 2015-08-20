@@ -28,16 +28,17 @@ void lcd_setfont(int f)
 
 int  lcd_getfontwidth(void)
 {
-    //FIXME!!!
-    return 8;
+    const struct font_desc *font;
+    font = fonts[fontn];
+    return font->width;
 }
 
 int  lcd_getfontheight(void)
 {
-    //FIXME!!!
-    return 8;
+    const struct font_desc *font;
+    font = fonts[fontn];
+    return font->height;
 }
-
 
 void lcd_display(void)
 {
