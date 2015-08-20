@@ -24,7 +24,8 @@
 #define msleep(MS)	usleep((MS) * 1000)
 
 int  statusbar(void);
-int  show_clock(void);
+int  show_time(void);
+int  show_analog(void);
 
 int i2cdev_testopen(const char *devbusname, int i2caddr_test)
 {
@@ -64,7 +65,7 @@ int seconds = 35;
 
 // Global variables to help draw the clock face:
 const int MIDDLE_X = 128 / 2;
-const int MIDDLE_Y = 64  / 2;
+const int MIDDLE_Y = ((64 - 8)  / 2 + 8);
 
 int CLOCK_RADIUS;
 int POS_12_X, POS_12_Y;
@@ -84,6 +85,8 @@ void initClockVariables(void);
 int main(int argc, char * argv[])
 {
     int fd_oled;
+    int display_mode = 0;
+    int timechanged;
 
     fd_oled = i2cdev_testopen("/dev/i2c-1", I2CADDR_OLED);
     if (fd_oled < 0) {
@@ -104,37 +107,43 @@ int main(int argc, char * argv[])
     msleep(200);
     
     initClockVariables();
-    //drawArms(int h, int m, int s);
-    //drawFace(void);
 
     while(1) {
-	statusbar();
-	
-	show_clock();
-	drawFace();  // Draw the face to the buffer
-	drawArms(hours, minutes, seconds);  // Draw arms to the buffer
-	
+	timechanged = statusbar();
+
+	switch(display_mode) {
+	case 0:
+	    if (timechanged == 0)
+		show_time();
+//	    break;
+	case 1:
+	    if (timechanged == 0)
+		show_analog();
+	    break;
+	default:
+	    break;
+	}
+
 	lcd_display();
 	msleep(200);
     }
     
-    
     return 0;
-    
 }
 
+time_t prev_time = 0;
+time_t current_time;
+struct tm * time_info;
 
 int statusbar(void)
 {
-    static time_t prev_time;
-    time_t current_time;
-    struct tm * time_info;
     char timeString[32];  // space for "HH:MM:SS\0"
     
     time(&current_time);
     if (current_time == prev_time) {
 	return -1;
     }
+    lcd_clear();
     
     prev_time = current_time;
     time_info = localtime(&current_time);
@@ -146,22 +155,11 @@ int statusbar(void)
     return 0;
 }
 
-int show_clock(void)
+int show_time(void)
 {
-    static time_t prev_time;
-    time_t current_time;
-    struct tm * time_info;
-    char timeString[16];  // space for "HH:MM:SS\0"
+    char timeString[32];  // space for "HH:MM:SS\0"
     
-    time(&current_time);
-    if (current_time == prev_time) {
-	return -1;
-    }
-    
-    prev_time = current_time;
-    time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
-
     lcd_setfont(5);
     // TODO: show defintions of centre justify calculations
     lcd_gotoxy((128 - (12 * 8))/2, (64 - 22) / 2 + 8);
@@ -169,22 +167,24 @@ int show_clock(void)
 
     return 0;
 }
-
-#define max(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-	__typeof__ (b) _b = (b); \
-	_a > _b ? _a : _b; })
-
-#define min(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-	__typeof__ (b) _b = (b); \
-	_a < _b ? _a : _b; })
-
+    
+int show_analog(void)
+{
+    hours = time_info->tm_hour;
+    minutes = time_info->tm_min;
+    seconds = time_info->tm_sec;
+    
+    drawFace();
+    drawArms(hours, minutes, seconds);
+    return 0;
+}
+    
 void initClockVariables()
 {
     // Calculate constants for clock face component positions:
     lcd_setfont(0);
-    CLOCK_RADIUS = min(MIDDLE_X, MIDDLE_Y) - 1;
+//    CLOCK_RADIUS = min(MIDDLE_X, MIDDLE_Y) - 1;
+    CLOCK_RADIUS = (64 - 8) / 2;
     POS_12_X = MIDDLE_X - lcd_getfontwidth();
     POS_12_Y = MIDDLE_Y - CLOCK_RADIUS + 2;
     POS_3_X  = MIDDLE_X + CLOCK_RADIUS - lcd_getfontwidth() - 1;
@@ -228,7 +228,6 @@ void drawArms(int h, int m, int s)
     // draw the second hand:
     lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + sx, MIDDLE_Y + sy, 1, 0);
     
-#if 0
     m = map(m, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
     mx = M_LENGTH * cos(M_PI * ((float)m) / 180);  // woo trig!
     my = M_LENGTH * sin(M_PI * ((float)m) / 180);  // woo trig!
@@ -243,7 +242,6 @@ void drawArms(int h, int m, int s)
     hy = H_LENGTH * sin(M_PI * ((float)h) / 180);  // woo trig!
     // draw the hour hand:
     lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + hx, MIDDLE_Y + hy, 1, 0);
-#endif
 }
 
 // Draw an analog clock face
