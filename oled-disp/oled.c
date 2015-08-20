@@ -20,19 +20,10 @@
 #include "ssd1306.h"
 #include "lcd-gfx.h"
 
-//#include "fonts/linux/font.h"
-//extern const struct font_desc *fonts[];
-
 #define I2CADDR_OLED SSD1306_I2C_ADDRESS
 #define msleep(MS)	usleep((MS) * 1000)
 
 int  statusbar(void);
-
-extern void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
-		     uint8_t color, uint8_t mode);
-extern void circle(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color, uint8_t mode);
-
-
 int  show_clock(void);
 
 int i2cdev_testopen(const char *devbusname, int i2caddr_test)
@@ -87,17 +78,9 @@ int main(int argc, char * argv[])
     while(1) {
 	statusbar();
 	
-#if 0
-	lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
-		     uint8_t color, uint8_t mode);
-	circle(uint8_t x0, uint8_t y0, uint8_t radius,
-	       uint8_t color, uint8_t mode) {
-#endif	
-	lcd_line(0, 8, 150, 8, 1, 1);
-        lcd_line(0, 0, 150, 100, 1, 1);
-	circle(50, 50, 10, 1, 1);
-	    
 	show_clock();
+	
+	lcd_display();
 	msleep(200);
     }
     
@@ -145,16 +128,8 @@ int show_clock(void)
     time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%H:%M:%S", time_info);
 
-#if 0
-    lcd_setfont(1);
-    lcd_gotoxy(32,16);
-    lcd_puts(timeString);
-
-    lcd_setfont(3);
-    lcd_gotoxy(32,32);
-    lcd_puts(timeString);
-#endif
     lcd_setfont(5);
+    // TODO: show defintions of centre justify calculations
     lcd_gotoxy((128 - (12 * 8))/2, (64 - 22) / 2 + 8);
     lcd_puts(timeString);
   

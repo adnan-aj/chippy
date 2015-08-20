@@ -6,15 +6,13 @@
 
 /* http://stackoverflow.com/questions/3982348/implement-generic-swap-macro-in-c */
 #define swap(x,y) do \
-{ unsigned char swap_temp[sizeof(x) == sizeof(y) ? (signed)sizeof(x) : -1]; \
-memcpy(swap_temp,&y,sizeof(x)); \
-memcpy(&y,&x,       sizeof(x)); \
-memcpy(&x,swap_temp,sizeof(x)); \
-} while(0)
+    { unsigned char swap_temp[sizeof(x) == sizeof(y) ? (signed)sizeof(x) : -1]; \
+	memcpy(swap_temp,&y,sizeof(x)); \
+	memcpy(&y,&x,       sizeof(x)); \
+	memcpy(&x,swap_temp,sizeof(x)); \
+    } while(0)
 
 #define pixel(X, Y, COLOR, MODE)	drawPixel((X), (Y), (COLOR))
-
-
 
 extern const struct font_desc *fonts[];
 static int cur_x = 0, cur_y = 0, fontn = 0;
@@ -38,6 +36,17 @@ int  lcd_getfontheight(void)
     return 0;
 }
 
+
+void lcd_display(void)
+{
+    display();
+}
+
+void lcd_clear(void)
+{
+    clearDisplay();
+}
+
 void lcd_home(void)
 {
     cur_x = cur_y = 0;
@@ -51,7 +60,7 @@ void lcd_gotoxy(int x, int y)
 
 void lcd_putc(int c)
 {
-    lcd_putchar(c, 1);
+    lcd_putchar(c, 0);
 }
 
 void lcd_puts(char *s)
@@ -59,7 +68,6 @@ void lcd_puts(char *s)
     while (*s) {
 	lcd_putchar(*s++, 0);
     }
-    display();
 }
 
 void lcd_putchar(int c, int update)
@@ -112,8 +120,7 @@ void lcd_putchar(int c, int update)
 }
 
 
-void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
-	      uint8_t color, uint8_t mode)
+void lcd_line(int x0, int y0, int x1, int y1, int color, int mode)
 {
     uint8_t steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
@@ -152,37 +159,38 @@ void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1,
     }
 }
 
-void circle(uint8_t x0, uint8_t y0, uint8_t radius, uint8_t color, uint8_t mode) {
-	int8_t f = 1 - radius;
-	int8_t ddF_x = 1;
-	int8_t ddF_y = -2 * radius;
-	int8_t x = 0;
-	int8_t y = radius;
-
-	pixel(x0, y0+radius, color, mode);
-	pixel(x0, y0-radius, color, mode);
-	pixel(x0+radius, y0, color, mode);
-	pixel(x0-radius, y0, color, mode);
-
-	while (x<y) {
-		if (f >= 0) {
-			y--;
-			ddF_y += 2;
-			f += ddF_y;
-		}
-		x++;
-		ddF_x += 2;
-		f += ddF_x;
-
-		pixel(x0 + x, y0 + y, color, mode);
-		pixel(x0 - x, y0 + y, color, mode);
-		pixel(x0 + x, y0 - y, color, mode);
-		pixel(x0 - x, y0 - y, color, mode);
-
-		pixel(x0 + y, y0 + x, color, mode);
-		pixel(x0 - y, y0 + x, color, mode);
-		pixel(x0 + y, y0 - x, color, mode);
-		pixel(x0 - y, y0 - x, color, mode);
-
+void lcd_circle(int x0, int y0, int radius, int color, int mode)
+{
+    int8_t f = 1 - radius;
+    int8_t ddF_x = 1;
+    int8_t ddF_y = -2 * radius;
+    int8_t x = 0;
+    int8_t y = radius;
+    
+    pixel(x0, y0+radius, color, mode);
+    pixel(x0, y0-radius, color, mode);
+    pixel(x0+radius, y0, color, mode);
+    pixel(x0-radius, y0, color, mode);
+    
+    while (x < y) {
+	if (f >= 0) {
+	    y--;
+	    ddF_y += 2;
+	    f += ddF_y;
 	}
+	x++;
+	ddF_x += 2;
+	f += ddF_x;
+	
+	pixel(x0 + x, y0 + y, color, mode);
+	pixel(x0 - x, y0 + y, color, mode);
+	pixel(x0 + x, y0 - y, color, mode);
+	pixel(x0 - x, y0 - y, color, mode);
+	
+	pixel(x0 + y, y0 + x, color, mode);
+	pixel(x0 - y, y0 + x, color, mode);
+	pixel(x0 + y, y0 - x, color, mode);
+	pixel(x0 - y, y0 - x, color, mode);
+	
+    }
 }
