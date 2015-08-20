@@ -8,10 +8,10 @@
 
 CC = gcc
 CFLAGS = -c -Wall -I ../c_examples -DSSD1306_128_64
-LDFLAGS =
+LDFLAGS = -lm
 
 TARGET   = oled
-SOURCES  = oled.c i2cdev-ssd1306.c lcd-gfx.c
+SOURCES  = oled.c i2cdev-ssd1306.c lcd-gfx.c clock.c
 HEADERS  = ssd1306.h i2c-userspace.h lcd-gfx.h fonts/font.h
 FONTS    = fonts/fonts.a
 

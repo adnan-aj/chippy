@@ -16,7 +16,7 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <time.h>
-
+#include <math.h>
 #include "ssd1306.h"
 #include "lcd-gfx.h"
 
@@ -53,6 +53,34 @@ int i2cdev_testopen(const char *devbusname, int i2caddr_test)
     return fd;
 }
 
+/* https://raw.githubusercontent.com/sparkfun/
+ * SparkFun_Micro_OLED_Arduino_Library/master/examples/
+ * MicroOLED_Clock/MicroOLED_Clock.ino
+ */
+
+int hours = 11;
+int minutes = 55;
+int seconds = 35;
+
+// Global variables to help draw the clock face:
+const int MIDDLE_X = 128 / 2;
+const int MIDDLE_Y = 64  / 2;
+
+int CLOCK_RADIUS;
+int POS_12_X, POS_12_Y;
+int POS_3_X, POS_3_Y;
+int POS_6_X, POS_6_Y;
+int POS_9_X, POS_9_Y;
+int S_LENGTH;
+int M_LENGTH;
+int H_LENGTH;
+
+unsigned long lastDraw = 0;
+
+void drawArms(int h, int m, int s);
+void drawFace(void);
+void initClockVariables(void);
+
 int main(int argc, char * argv[])
 {
     int fd_oled;
@@ -75,10 +103,16 @@ int main(int argc, char * argv[])
     invertDisplay(0);
     msleep(200);
     
+    initClockVariables();
+    //drawArms(int h, int m, int s);
+    //drawFace(void);
+
     while(1) {
 	statusbar();
 	
 	show_clock();
+	drawFace();  // Draw the face to the buffer
+	drawArms(hours, minutes, seconds);  // Draw arms to the buffer
 	
 	lcd_display();
 	msleep(200);
@@ -132,6 +166,100 @@ int show_clock(void)
     // TODO: show defintions of centre justify calculations
     lcd_gotoxy((128 - (12 * 8))/2, (64 - 22) / 2 + 8);
     lcd_puts(timeString);
-  
+
     return 0;
+}
+
+#define max(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+	__typeof__ (b) _b = (b); \
+	_a > _b ? _a : _b; })
+
+#define min(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+	__typeof__ (b) _b = (b); \
+	_a < _b ? _a : _b; })
+
+void initClockVariables()
+{
+    // Calculate constants for clock face component positions:
+    lcd_setfont(0);
+    CLOCK_RADIUS = min(MIDDLE_X, MIDDLE_Y) - 1;
+    POS_12_X = MIDDLE_X - lcd_getfontwidth();
+    POS_12_Y = MIDDLE_Y - CLOCK_RADIUS + 2;
+    POS_3_X  = MIDDLE_X + CLOCK_RADIUS - lcd_getfontwidth() - 1;
+    POS_3_Y  = MIDDLE_Y - lcd_getfontheight()/2;
+    POS_6_X  = MIDDLE_X - lcd_getfontwidth()/2;
+    POS_6_Y  = MIDDLE_Y + CLOCK_RADIUS - lcd_getfontheight() - 1;
+    POS_9_X  = MIDDLE_X - CLOCK_RADIUS + lcd_getfontwidth() - 2;
+    POS_9_Y  = MIDDLE_Y - lcd_getfontheight()/2;
+    
+    // Calculate clock arm lengths
+    S_LENGTH = CLOCK_RADIUS - 2;
+    M_LENGTH = S_LENGTH * 0.7;
+    H_LENGTH = S_LENGTH * 0.5;
+}
+
+// Draw the clock's three arms: seconds, minutes, hours.
+void drawArms(int h, int m, int s)
+{
+    double midHours;  // this will be used to slightly adjust the hour hand
+    static int hx, hy, mx, my, sx, sy;
+    
+    // Adjust time to shift display 90 degrees ccw
+    // this will turn the clock the same direction as text:
+    h -= 3;
+    m -= 15;
+    s -= 15;
+    if (h <= 0)
+	h += 12;
+    if (m < 0)
+	m += 60;
+    if (s < 0)
+	s += 60;
+    
+    //mapping    Y = (X-A)/(B-A) * (D-C) + C
+#define map(X, A, B, C, D) (((float)(X)-(float)(A))/((float)(B)-(float)(A)) * ((float)(D)-(float)(C)) + (float)(C))
+    
+    // Calculate and draw new lines:
+    s = map(s, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
+    sx = S_LENGTH * cos(M_PI * ((float)s) / 180);  // woo trig!
+    sy = S_LENGTH * sin(M_PI * ((float)s) / 180);  // woo trig!
+    // draw the second hand:
+    lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + sx, MIDDLE_Y + sy, 1, 0);
+    
+#if 0
+    m = map(m, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
+    mx = M_LENGTH * cos(M_PI * ((float)m) / 180);  // woo trig!
+    my = M_LENGTH * sin(M_PI * ((float)m) / 180);  // woo trig!
+    // draw the minute hand
+    lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + mx, MIDDLE_Y + my, 1, 0);
+    
+    midHours = minutes/12;  // midHours is used to set the hours hand to middling levels between whole hours
+    h *= 5;  // Get hours and midhours to the same scale
+    h += midHours;  // add hours and midhours
+    h = map(h, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
+    hx = H_LENGTH * cos(M_PI * ((float)h) / 180);  // woo trig!
+    hy = H_LENGTH * sin(M_PI * ((float)h) / 180);  // woo trig!
+    // draw the hour hand:
+    lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + hx, MIDDLE_Y + hy, 1, 0);
+#endif
+}
+
+// Draw an analog clock face
+void drawFace()
+{
+    // Draw the clock border
+    lcd_circle(MIDDLE_X, MIDDLE_Y, CLOCK_RADIUS, 1, 0);
+    
+    // Draw the clock numbers
+    lcd_setfont(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
+    lcd_gotoxy(POS_12_X, POS_12_Y); // points cursor to x=27 y=0
+    lcd_puts("12");
+    lcd_gotoxy(POS_6_X, POS_6_Y);
+    lcd_puts("6");
+    lcd_gotoxy(POS_9_X, POS_9_Y);
+    lcd_puts("9");
+    lcd_gotoxy(POS_3_X, POS_3_Y);
+    lcd_puts("3");
 }

@@ -28,12 +28,14 @@ void lcd_setfont(int f)
 
 int  lcd_getfontwidth(void)
 {
-    return 0;
+    //FIXME!!!
+    return 8;
 }
 
 int  lcd_getfontheight(void)
 {
-    return 0;
+    //FIXME!!!
+    return 8;
 }
 
 
