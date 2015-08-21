@@ -16,6 +16,7 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 #include <time.h>
+#include <sys/stat.h>
 #include <math.h>
 #include "ssd1306.h"
 #include "lcd-gfx.h"
@@ -54,6 +55,10 @@ int i2cdev_testopen(const char *devbusname, int i2caddr_test)
     return fd;
 }
 
+time_t prev_time = 0;
+time_t current_time;
+struct tm * time_info;
+time_t config_time = 0;
 /* https://raw.githubusercontent.com/sparkfun/
  * SparkFun_Micro_OLED_Arduino_Library/master/examples/
  * MicroOLED_Clock/MicroOLED_Clock.ino
@@ -84,9 +89,13 @@ void initClockVariables(void);
 
 int main(int argc, char * argv[])
 {
-    int fd_oled;
+    int fd_oled, fd_config;
+    struct stat sb;
     int display_mode = 0;
-    int timechanged;
+    int time_changed;
+    int config_changed;
+    int wait;
+    FILE *f_config;
 
     fd_oled = i2cdev_testopen("/dev/i2c-1", I2CADDR_OLED);
     if (fd_oled < 0) {
@@ -108,22 +117,52 @@ int main(int argc, char * argv[])
     
     initClockVariables();
 
+    wait = 0;
+    config_time = 0;
+    display_mode = 0;
+    
     while(1) {
-	timechanged = statusbar();
+	if (stat("/tmp/.oled", &sb) == 0)
+	{
+	    if (sb.st_mtime != config_time) {
+		config_time = sb.st_mtime;
+		//printf("Last file modification:   %s", ctime(&config_time));	config_changed = 0;
+		if ((f_config = fopen("/tmp/.oled", "r")) != NULL) {
+		    fscanf(f_config, "%d", &display_mode);
+		    //printf("Current display mode: %d\n", display_mode);
+		    fclose(f_config);
+		}
+	    }
+	}
+	
+	time_changed = 0;
+	time(&current_time);
+	if (current_time != prev_time) {
+	    time_changed = 1;
+	    time_info = localtime(&current_time);
+	    prev_time = current_time;
+	}
 
 	switch(display_mode) {
 	case 0:
-	    if (timechanged == 0)
+	    if (time_changed) {
+		lcd_clear();
 		show_time();
-//	    break;
+	    }
+	    break;
 	case 1:
-	    if (timechanged == 0)
+	    if (time_changed) {
+		lcd_clear();
 		show_analog();
+	    }
 	    break;
 	default:
 	    break;
 	}
 
+	if (time_changed) {
+	    statusbar();
+	}
 	lcd_display();
 	msleep(200);
     }
@@ -131,24 +170,11 @@ int main(int argc, char * argv[])
     return 0;
 }
 
-time_t prev_time = 0;
-time_t current_time;
-struct tm * time_info;
-
 int statusbar(void)
 {
     char timeString[32];  // space for "HH:MM:SS\0"
     
-    time(&current_time);
-    if (current_time == prev_time) {
-	return -1;
-    }
-    lcd_clear();
-    
-    prev_time = current_time;
-    time_info = localtime(&current_time);
     strftime(timeString, sizeof(timeString), "%a %h %e %H:%M", time_info);
-
     lcd_setfont(0);
     lcd_gotoxy(0,0);
     lcd_puts(timeString);
@@ -164,7 +190,6 @@ int show_time(void)
     // TODO: show defintions of centre justify calculations
     lcd_gotoxy((128 - (12 * 8))/2, (64 - 22) / 2 + 8);
     lcd_puts(timeString);
-
     return 0;
 }
     
@@ -218,7 +243,7 @@ void drawArms(int h, int m, int s)
     if (s < 0)
 	s += 60;
     
-    //mapping    Y = (X-A)/(B-A) * (D-C) + C
+//mapping    Y = (X-A)/(B-A) * (D-C) + C
 #define map(X, A, B, C, D) (((float)(X)-(float)(A))/((float)(B)-(float)(A)) * ((float)(D)-(float)(C)) + (float)(C))
     
     // Calculate and draw new lines:
@@ -249,7 +274,6 @@ void drawFace()
 {
     // Draw the clock border
     lcd_circle(MIDDLE_X, MIDDLE_Y, CLOCK_RADIUS, 1, 0);
-    
     // Draw the clock numbers
     lcd_setfont(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
     lcd_gotoxy(POS_12_X, POS_12_Y); // points cursor to x=27 y=0
