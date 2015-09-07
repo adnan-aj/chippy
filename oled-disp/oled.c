@@ -69,7 +69,8 @@ int minutes = 55;
 int seconds = 35;
 
 // Global variables to help draw the clock face:
-const int MIDDLE_X = 128 / 2;
+const int MIDDLE_X = 128 / 4;
+const int MIDDLE_X2 = 128 / 4 * 3;
 const int MIDDLE_Y = ((64 - 8)  / 2 + 8);
 
 int CLOCK_RADIUS;
@@ -209,7 +210,7 @@ void initClockVariables()
     // Calculate constants for clock face component positions:
     lcd_setfont(0);
 //    CLOCK_RADIUS = min(MIDDLE_X, MIDDLE_Y) - 1;
-    CLOCK_RADIUS = (64 - 8) / 2;
+    CLOCK_RADIUS = (64 - 8) / 2 - 2;
     POS_12_X = MIDDLE_X - lcd_getfontwidth();
     POS_12_Y = MIDDLE_Y - CLOCK_RADIUS + 2;
     POS_3_X  = MIDDLE_X + CLOCK_RADIUS - lcd_getfontwidth() - 1;
@@ -229,7 +230,11 @@ void initClockVariables()
 void drawArms(int h, int m, int s)
 {
     double midHours;  // this will be used to slightly adjust the hour hand
-    static int hx, hy, mx, my, sx, sy;
+    static int hx, hy, mx, my, sx, sy, sx2, sy2;
+    char text[8];
+
+    sprintf(text, ":%02d", s);
+    
     
     // Adjust time to shift display 90 degrees ccw
     // this will turn the clock the same direction as text:
@@ -250,9 +255,11 @@ void drawArms(int h, int m, int s)
     s = map(s, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
     sx = S_LENGTH * cos(M_PI * ((float)s) / 180);  // woo trig!
     sy = S_LENGTH * sin(M_PI * ((float)s) / 180);  // woo trig!
+    sx2 = 0.7 * S_LENGTH * cos(M_PI * ((float)s) / 180);  // woo trig!
+    sy2 = 0.7 * S_LENGTH * sin(M_PI * ((float)s) / 180);  // woo trig!
     // draw the second hand:
     lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + sx, MIDDLE_Y + sy, 1, 0);
-    
+
     m = map(m, 0, 60, 0, 360);  // map the 0-60, to "360 degrees"
     mx = M_LENGTH * cos(M_PI * ((float)m) / 180);  // woo trig!
     my = M_LENGTH * sin(M_PI * ((float)m) / 180);  // woo trig!
@@ -267,6 +274,14 @@ void drawArms(int h, int m, int s)
     hy = H_LENGTH * sin(M_PI * ((float)h) / 180);  // woo trig!
     // draw the hour hand:
     lcd_line(MIDDLE_X, MIDDLE_Y, MIDDLE_X + hx, MIDDLE_Y + hy, 1, 0);
+
+
+    // Seconds face of dual analog display
+    lcd_line(MIDDLE_X2 + sx2, MIDDLE_Y + sy2, MIDDLE_X2 + sx, MIDDLE_Y + sy, 1, 0);
+    lcd_setfont(0);
+    lcd_gotoxy(MIDDLE_X2 - (lcd_getfontwidth()*1.5), MIDDLE_Y - lcd_getfontheight() /2);
+    lcd_puts(text);
+
 }
 
 // Draw an analog clock face
@@ -274,6 +289,7 @@ void drawFace()
 {
     // Draw the clock border
     lcd_circle(MIDDLE_X, MIDDLE_Y, CLOCK_RADIUS, 1, 0);
+    lcd_circle(MIDDLE_X2, MIDDLE_Y, CLOCK_RADIUS, 1, 0);
     // Draw the clock numbers
     lcd_setfont(0); // set font type 0, please see declaration in SFE_MicroOLED.cpp
     lcd_gotoxy(POS_12_X, POS_12_Y); // points cursor to x=27 y=0
