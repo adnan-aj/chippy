@@ -1,0 +1,209 @@
+wake up
+be alert
+shutdown
+power off
+be quiet
+
+melody
+mosfet
+hello melody
+hello mosfet
+okay melody
+okay mosfet
+yes melody
+yes mosfet
+
+who are you
+who are they
+when 
+what
+why
+where are you
+where am i
+where are we
+how
+
+yes
+no
+wrong
+incorrect
+correct
+
+show time
+show clock
+show date
+show compass
+show clock and compass
+show heartbeat
+show pulse rate
+show net stat
+show net status
+show network status
+show temperature
+show the temperature
+
+show me the time
+tell me the time
+show me the date
+show my heartbeat
+show my pulse
+show my pulse rate
+
+what time is it
+what day is it
+what is the date
+what is the time now
+whats my pulse rate
+whats my blood pressure
+whats my B.P.
+what is your battery status
+what is your network connection
+what is your network status
+
+times of the day
+set alarm clock
+A.M.
+P.M.
+today
+tomorrow
+yesterday
+next week
+last week
+next month
+last month
+next year
+last year
+weeks from now
+months from now
+years from now
+good morning
+good afternoon
+good evening
+good night
+
+switch lights on
+switch on lights
+switch lights off
+switch off lights
+lights out
+lights up
+brighter
+darker
+make it dimmer
+make it brighter
+dim up
+dim down
+
+color
+colors
+foreground
+background
+red
+green
+blue
+magenta
+cyan
+yellow
+white
+black
+gray
+maroon
+navy blue
+purple
+orange
+brown
+
+places
+table
+chair
+console
+bathroom
+bedroom
+living room
+kitchen
+
+up
+down
+left
+right
+forward
+backward
+backwards
+zoom in
+zoom out
+
+front
+back
+rear
+north
+south
+east
+west
+the item in front of
+the object behind of
+to the left
+to the right
+
+open
+close
+move forward
+move forwards
+move back
+move backwards
+reverse
+park yourself
+stop
+go forward
+go backwards
+go left
+go right
+turn
+turn right
+turn left
+start
+rotate
+rotate left
+roate right
+restart
+faster
+slower
+hold position
+jump up
+jump higher
+go lower
+
+digit
+digits
+number
+numbers
+one
+two
+three
+four
+five
+six seven
+eight
+nine
+ten
+eleven
+twelve
+thirteen
+fourteen
+fifteen
+sixteen
+seventeen
+eighteen
+nineteen
+twenty
+thirty
+forty
+fifty
+sixty
+seventy
+eighty
+ninety
+hundred
+thousand
+million
+billion
+trillion
