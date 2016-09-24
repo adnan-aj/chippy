@@ -23,3 +23,5 @@ Compiled with
 cairo-time-mjpg.cpp --
 Same as above cairo-text-mjpg.cpp, except changes the text to tell the
 time.
+
+g++ -o cam-cairo-text-mjpg2 cam-cairo-text-mjpg2.cpp `pkg-config --cflags --libs --static opencv cairo`
