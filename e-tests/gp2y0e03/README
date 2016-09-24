@@ -1,0 +1,36 @@
+GP2Y0E03 Distance Measuring Sensor Userspace Driver for Linux
+Copyright (C) 2014 Hiroshi Takekawa
+
+*** Licensing Term
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; version 2 of the
+License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+ATTENTION: GPL version 2 only. You cannot apply any later version.
+This situation may change in the future.
+
+
+*** How to use
+
+Just type 'make' to compile on your target board.
+To cross-compile, adjust CC variable in Makefile. (Not tested)
+
+Run './gp2y0e03' to get the distance from your sensor.
+
+You should have the permission to access to the I2C busses.  You should
+be either in the member of 'i2c' group or root.
+
+
+*** Contact
+E-mail: Hiroshi Takekawa <sian@big.or.jp>
