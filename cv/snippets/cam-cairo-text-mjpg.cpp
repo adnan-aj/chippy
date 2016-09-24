@@ -87,7 +87,7 @@ void putTextCairo(cv::Mat &targetImage,
 
 int main(int argc, char*argv[])
 {
-    string outFile ("/tmp/mjpg3/out.mjpg");
+    string outFile ("/tmp/mjpg1/out.mjpg");
     int mjpgSizeX = 320;
     int mjpgSizeY = 240;
     bool mjpgIsColored = true;
