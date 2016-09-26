@@ -1,0 +1,27 @@
+2016-09-25 adnan@singnet.com.sg
+
+MLX90614 I2C is 100kHz only.
+
+Edison I2C busses are capable of std(100kHz), fast(400kHz) and high(3.4MHz).
+Default by kernel for I2C-1 is fast.
+
+
+root@edison:/sys/devices# find -name i2c-1
+./pci0000:00/0000:00:08.0/i2c-1
+./pci0000:00/0000:00:08.0/i2c-1/i2c-dev/i2c-1
+
+root@mosfet:/sys/devices# cd pci0000:00/0000:00:08.0
+root@mosfet:/sys/devices/pci0000:00/0000:00:08.0# find -name i2c\*
+./i2c-1
+./i2c-1/i2c-dev
+./i2c-1/i2c-dev/i2c-1
+./i2c_dw_sysnode
+root@mosfet:/sys/devices/pci0000:00/0000:00:08.0# find -name mode
+./i2c_dw_sysnode/mode
+
+root@mosfet:/sys/devices/pci0000:00/0000:00:08.0/i2c_dw_sysnode# cat mode
+fast
+root@mosfet:/sys/devices/pci0000:00/0000:00:08.0/i2c_dw_sysnode#echo std > mode
+root@mosfet:/sys/devices/pci0000:00/0000:00:08.0/i2c_dw_sysnode# cat mode
+std
+
