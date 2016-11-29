@@ -1,11 +1,14 @@
 #!/bin/bash
 
-
 # Loop recording script - work in progress
 # for using stt.sh script to test IBM Bluemix Watson STT service.
 # Adnan adnan@singnet.com.sg
 # expanded from auto-recording using sox record
 #   rec -c 1 -r 16000 testfile.flac silence 1 0.1 0.19% 1 1.5 0.3%
+
+# References
+# http://ymkimit.blogspot.sg/2014/07/recording-sound-detecting-silence.html
+# http://digitalcardboard.com/blog/2009/08/25/the-sox-of-silence/
 
 
 # The above-periods value is used to indicate if audio should be trimmed at
